@@ -1,0 +1,17 @@
+{
+  "name": "notion-integration",
+  "version": "1.0.0",
+  "description": "Notion custom integration test",
+  "main": "srcs/index.js",
+  "type": "module",
+  "repository": "git@github.com:gmarcha/notion-integration.git",
+  "author": "gmarcha <gmarcha@github.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@notionhq/client": "^2.1.1",
+    "dotenv": "^16.0.1"
+  },
+  "scripts": {
+    "start": "node srcs/index.js"
+  }
+}
