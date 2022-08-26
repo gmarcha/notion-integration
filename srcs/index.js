@@ -3,14 +3,14 @@ import { Client } from "@notionhq/client"
 
 const notion = new Client({ auth: process.env.NOTION_KEY })
 
-const databaseId = process.env.NOTION_DATABASE_ID
+const databaseId = process.env.NOTION_TASKS_DATABASE_ID
 
-async function addItem(title, contactID, type, availability, epicIDs) {
+async function addTask(title, campusPageID, epicPageID, priority, index) {
   try {
     const issue = await notion.pages.create({
       parent: { database_id: databaseId },
       properties: {
-        Name: { 
+        Task: { 
           title: [
             {
               text: {
@@ -19,74 +19,70 @@ async function addItem(title, contactID, type, availability, epicIDs) {
             }
           ]
         },
-        Type: {
+        Priority: {
           select: {
-            name: type
+            name: priority
           }
         },
-        Availability: {
-          select: {
-            name: availability
-          }
+        Index: {
+          number: index
         },
-        Contact: {
+        Campus: {
           relation: [
             {
-              id: contactID
+              id: campusPageID
             }
           ]
         },
         Epics: {
           relation: [
             {
-              id: epicIDs[0]
-            }, {
-              id: epicIDs[1]
+              id: epicPageID
             }
           ]
         }
       },
-      children: [
-        {
-          object: "block",
-          heading_1: {
-              rich_text: [
-                  {
-                      text: {
-                          content: "Description"
-                      }
-                  }
-              ]
-          }
-        },
-        {
-          object: "block",
-          divider: {}
-        },
-        {
-          object: "block",
-          bulleted_list_item: {
-            rich_text: [
-              {
-                  text: {
-                      content: "Configuration"
-                  }
-              }
-            ]
-          }
-        },
-        {
-          object: "block",
-          bulleted_list_item: {
-            rich_text: [
-              {
-                  text: {
-                      content: "Impacted users"
-                  }
-              }
-            ]
-          }
-        },
+      // children: [
+      //   {
+      //     object: "block",
+      //     heading_1: {
+      //         rich_text: [
+      //             {
+      //                 text: {
+      //                     content: "Description"
+      //                 }
+      //             }
+      //         ]
+      //     }
+      //   },
+      //   {
+      //     object: "block",
+      //     divider: {}
+      //   },
+      //   {
+      //     object: "block",
+      //     bulleted_list_item: {
+      //       rich_text: [
+      //         {
+      //             text: {
+      //                 content: "Configuration"
+      //             }
+      //         }
+      //       ]
+      //     }
+      //   },
+      //   {
+      //     object: "block",
+      //     bulleted_list_item: {
+      //       rich_text: [
+      //         {
+      //             text: {
+      //                 content: "Impacted users"
+      //             }
+      //         }
+      //       ]
+      //     }
+      //   },
         // {
         //   object: "block",
         //   heading_1: {
@@ -119,28 +115,8 @@ async function addItem(title, contactID, type, availability, epicIDs) {
         //   object: "block",
         //   divider: {}
         // }
-      ]
+      // ]
     })
-    // await notion.databases.create({
-    //   parent: { page_id: issue.id },
-    //   title: [
-    //     {
-    //         type: "text",
-    //         text: {
-    //             content: "History from Campus",
-    //             link: null
-    //         }
-    //     }
-    //   ],
-    //   properties: {
-    //     Action: {
-    //       title: {}
-    //     },
-    //     Description: {
-    //       rich_text: {}
-    //     },
-    //   }
-    // })
     console.log(issue)
     console.log("Success! Entry added.")
   } catch (error) {
@@ -149,11 +125,27 @@ async function addItem(title, contactID, type, availability, epicIDs) {
   }
 }
 
-// Contact - Alan (42 Paris Founder)
-const contactID = "7e5940be128342fe96cea2ca3b2aef41"
-// Epic - Exam-master
-const firstEpicID = "7955fdbc7d2e482fb5a5aa998e02914f"
-// Epic - Exam setup
-const secondEpicID = "6503595772234645956cb9598c3884d2"
+const onboardingEpicPageID = "48072cbfad234cf68ad20f61beb82858"
 
-addItem("Hey Hoodie!", contactID, "Documentation", "Interrupted", [ firstEpicID, secondEpicID ])
+const tasksArray = [
+  "Book the domain name",
+  "Give access to Gandi",
+  "Give info about which mails have to be configured",
+  "Configure the mails on Gandi",
+  "Create account on the Intranet",
+  "Set up site admission",
+  "Create the campus group on keycloack",
+  "Create account on keycloak",
+  "Connect to keycloack though the mail",
+  "Communicate how to log in the admission site",
+  "Connect to the admission site",
+  "Giving access to the Knowledge Base",
+  "Start configuring the admission platform",
+]
+
+const args = process.argv.slice(2);
+const campusPageID = args[0];
+
+tasksArray.forEach((taskName, i) => {
+  addTask(taskName, campusPageID, onboardingEpicPageID, "P1", i+1)
+})
