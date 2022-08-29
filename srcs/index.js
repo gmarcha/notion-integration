@@ -3,12 +3,13 @@ import { Client } from "@notionhq/client"
 
 const notion = new Client({ auth: process.env.NOTION_KEY })
 
-const databaseId = process.env.NOTION_TASKS_DATABASE_ID
+const tasksDbId = process.env.NOTION_TASKS_DB_ID
+const onboardingTasksDbId = process.env.NOTION_ONBOARDING_TASKS_DB_ID
 
 async function addTask(title, campusPageID, epicPageID, priority, index) {
   try {
     const issue = await notion.pages.create({
-      parent: { database_id: databaseId },
+      parent: { database_id: tasksDbId },
       properties: {
         Task: { 
           title: [
@@ -146,6 +147,13 @@ const tasksArray = [
 const args = process.argv.slice(2);
 const campusPageID = args[0];
 
-tasksArray.forEach((taskName, i) => {
-  addTask(taskName, campusPageID, onboardingEpicPageID, "P1", i+1)
+const res = await notion.databases.query({ database_id: onboardingTasksDbId })
+
+res.results.forEach(async (task) => {
+  const res = await notion.pages.properties.retrieve({ page_id: task.id, property_id: 'title' })
+  console.log(res.results[0].title.text.content)
 })
+
+// tasksArray.forEach((taskName, i) => {
+//   addTask(taskName, campusPageID, onboardingEpicPageID, "P1", i+1)
+// })
